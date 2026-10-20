@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar' if custo else 'Registrar' }} custo · Prestação de Contas{% endblock %}
+{% block conteudo %}
+<h1>{{ 'Editar custo' if custo else 'Registrar custo' }}</h1>
+
+<form class="formulario" method="post" enctype="multipart/form-data">
+  <div class="grade">
+    <label>Data *
+      <input type="date" name="data" value="{{ form.data or '' }}" required>
+    </label>
+    <label>Valor (R$) *
+      <input type="text" name="valor" inputmode="decimal" placeholder="0,00" value="{{ form.valor or '' }}" required autofocus>
+    </label>
+  </div>
+
+  <label>Recebedor *
+    <input type="text" name="recebedor" placeholder="Fornecedor, funcionário, prestador..." value="{{ form.recebedor or '' }}" required>
+  </label>
+
+  <div class="grade">
+    <label>Forma de pagamento *
+      <select name="forma_pagamento" required>
+        <option value="">Selecione...</option>
+        {% for f in FORMAS_PAGAMENTO %}
+          <option value="{{ f }}" {{ 'selected' if form.forma_pagamento == f }}>{{ f }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <fieldset>
+      <legend>Tipo *</legend>
+      {% for chave, nome in TIPOS_CUSTO.items() %}
+        <label class="opcao">
+          <input type="radio" name="tipo" value="{{ chave }}" {{ 'checked' if form.tipo == chave }} required> {{ nome }}
+        </label>
+      {% endfor %}
+    </fieldset>
+  </div>
+
+  <label>Descrição / observação
+    <input type="text" name="descricao" placeholder="Ex.: compra de hortifrúti, salário de outubro..." value="{{ form.descricao or '' }}">
+  </label>
+
+  <label>Comprovante (imagem ou PDF)
+    <input type="file" name="comprovante" accept="image/*,application/pdf">
+  </label>
+  {% if custo and custo.comprovante %}
+    <p class="comprovante-atual">
+      Comprovante atual:
+      <a href="{{ url_for('comprovante', nome=custo.comprovante) }}" target="_blank">📎 {{ custo.comprovante_nome_original or custo.comprovante }}</a>
+      <label class="opcao"><input type="checkbox" name="remover_comprovante" value="1"> remover</label>
+      <br><small>Enviar um novo arquivo substitui o atual.</small>
+    </p>
+  {% endif %}
+
+  <div class="acoes">
+    <button type="submit" class="botao">Salvar</button>
+    {% if not custo %}
+      <button type="submit" class="botao botao-sec" name="continuar" value="1">Salvar e registrar outro</button>
+    {% endif %}
+    <a href="{{ url_for('custos') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

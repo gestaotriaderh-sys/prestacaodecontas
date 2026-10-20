@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Painel</h1>
+
+<div class="cartoes">
+  <div class="cartao">
+    <span class="rotulo">Caixa atual</span>
+    <strong class="{{ 'negativo' if caixa_atual < 0 }}">{{ caixa_atual|moeda }}</strong>
+  </div>
+  <div class="cartao">
+    <span class="rotulo">Entradas no mês</span>
+    <strong class="positivo">{{ entradas_mes|moeda }}</strong>
+  </div>
+  <div class="cartao">
+    <span class="rotulo">Custos no mês</span>
+    <strong class="negativo">{{ custos_mes|moeda }}</strong>
+  </div>
+  <div class="cartao">
+    <span class="rotulo">Saldo do mês</span>
+    <strong class="{{ 'negativo' if entradas_mes - custos_mes < 0 else 'positivo' }}">{{ (entradas_mes - custos_mes)|moeda }}</strong>
+  </div>
+</div>
+
+<div class="acoes">
+  <a class="botao" href="{{ url_for('novo_custo') }}">+ Registrar custo</a>
+  <a class="botao botao-sec" href="{{ url_for('entradas') }}">
+    {% if entrada_hoje %}Valor apurado hoje: {{ entrada_hoje.valor_centavos|moeda }} (alterar){% else %}+ Lançar valor apurado de hoje{% endif %}
+  </a>
+  <a class="botao botao-sec" href="{{ url_for('relatorio') }}">Gerar relatório</a>
+</div>
+
+<h2>Últimos custos</h2>
+{% if ultimos_custos %}
+<table>
+  <thead><tr><th>Data</th><th>Recebedor</th><th>Tipo</th><th>Pagamento</th><th class="num">Valor</th></tr></thead>
+  <tbody>
+  {% for c in ultimos_custos %}
+    <tr>
+      <td>{{ c.data|data_br }}</td>
+      <td>{{ c.recebedor }}</td>
+      <td>{{ TIPOS_CUSTO[c.tipo] }}</td>
+      <td>{{ c.forma_pagamento }}</td>
+      <td class="num">{{ c.valor_centavos|moeda }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="vazio">Nenhum custo registrado ainda.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block titulo %}Valor apurado · Prestação de Contas{% endblock %}
+{% block conteudo %}
+<h1>Valor apurado do dia</h1>
+
+<form class="formulario" method="post" action="{{ url_for('entradas') }}">
+  <div class="grade">
+    <label>Data *
+      <input type="date" name="data" value="{{ form.data or '' }}" required>
+    </label>
+    <label>Valor apurado (R$) *
+      <input type="text" name="valor" inputmode="decimal" placeholder="0,00" value="{{ form.valor or '' }}" required autofocus>
+    </label>
+  </div>
+  <label>Observação
+    <input type="text" name="observacao" value="{{ form.observacao or '' }}">
+  </label>
+  <p class="dica">Só existe um lançamento por dia: se a data já tiver valor, ele será substituído.</p>
+  <div class="acoes">
+    <button type="submit" class="botao">Salvar</button>
+  </div>
+</form>
+
+<h2>Lançamentos recentes</h2>
+{% if entradas %}
+<table>
+  <thead><tr><th>Data</th><th>Observação</th><th class="num">Valor apurado</th><th></th></tr></thead>
+  <tbody>
+  {% for e in entradas %}
+    <tr>
+      <td>{{ e.data|data_br }}</td>
+      <td>{{ e.observacao or '' }}</td>
+      <td class="num">{{ e.valor_centavos|moeda }}</td>
+      <td class="linha-acoes">
+        <a href="{{ url_for('entradas', editar=e.id) }}">Editar</a>
+        <form method="post" action="{{ url_for('excluir_entrada', entrada_id=e.id) }}" onsubmit="return confirm('Excluir este lançamento?')">
+          <button class="link-perigo" type="submit">Excluir</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="vazio">Nenhum valor apurado lançado ainda.</p>
+{% endif %}
+{% endblock %}

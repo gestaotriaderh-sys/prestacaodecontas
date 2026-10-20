@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block titulo %}Relatório · Prestação de Contas{% endblock %}
+{% block conteudo %}
+<h1 class="nao-imprimir">Relatório</h1>
+
+<form class="filtros nao-imprimir" method="get" action="{{ url_for('relatorio') }}">
+  <label>Data de início <input type="date" name="inicio" value="{{ inicio }}" required></label>
+  <label>Data de fim <input type="date" name="fim" value="{{ fim }}" required></label>
+  <button type="submit" class="botao">Gerar relatório</button>
+  {% if gerado %}<button type="button" class="botao botao-sec" onclick="window.print()">Imprimir / salvar PDF</button>{% endif %}
+</form>
+
+{% if gerado %}
+<section class="relatorio">
+  <h2>Prestação de contas — {{ inicio|data_br }} a {{ fim|data_br }}</h2>
+  <p class="dica">Gerado em {{ gerado_em.strftime('%d/%m/%Y %H:%M') }}</p>
+
+  <h3>Resumo</h3>
+  <table class="resumo">
+    <tr><td>Caixa no início do período (antes de {{ inicio|data_br }})</td><td class="num">{{ caixa_anterior|moeda }}</td></tr>
+    <tr><td>(+) Total de entradas (valor apurado)</td><td class="num positivo">{{ total_entradas|moeda }}</td></tr>
+    <tr><td class="recuo">Despesas</td><td class="num">{{ total_despesas|moeda }}</td></tr>
+    <tr><td class="recuo">Pagamentos de funcionários</td><td class="num">{{ total_funcionarios|moeda }}</td></tr>
+    <tr><td>(−) Total de custos</td><td class="num negativo">{{ total_custos|moeda }}</td></tr>
+    <tr class="destaque"><td>Saldo do período</td><td class="num {{ 'negativo' if saldo_periodo < 0 else 'positivo' }}">{{ saldo_periodo|moeda }}</td></tr>
+    <tr class="destaque"><td>Caixa ao final do período ({{ fim|data_br }})</td><td class="num {{ 'negativo' if caixa_final < 0 }}">{{ caixa_final|moeda }}</td></tr>
+  </table>
+
+  <h3>Movimento por dia</h3>
+  <table>
+    <thead><tr><th>Data</th><th class="num">Entrada</th><th class="num">Custos</th><th class="num">Saldo do dia</th><th class="num">Caixa</th></tr></thead>
+    <tbody>
+    {% for d in dias %}
+      <tr>
+        <td>{{ d.data|data_br }}</td>
+        <td class="num">{% if d.tem_entrada %}{{ d.entrada|moeda }}{% else %}<span class="vazio">não lançado</span>{% endif %}</td>
+        <td class="num">{{ d.custos|moeda }}</td>
+        <td class="num {{ 'negativo' if d.saldo < 0 }}">{{ d.saldo|moeda }}</td>
+        <td class="num {{ 'negativo' if d.caixa < 0 }}">{{ d.caixa|moeda }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><th>Total</th><th class="num">{{ total_entradas|moeda }}</th><th class="num">{{ total_custos|moeda }}</th><th class="num">{{ saldo_periodo|moeda }}</th><th class="num">{{ caixa_final|moeda }}</th></tr>
+    </tfoot>
+  </table>
+
+  <h3>Custos do período</h3>
+  {% if custos %}
+  <table>
+    <thead><tr><th>Data</th><th>Recebedor</th><th>Tipo</th><th>Pagamento</th><th>Descrição</th><th>Compr.</th><th class="num">Valor</th></tr></thead>
+    <tbody>
+    {% for c in custos %}
+      <tr>
+        <td>{{ c.data|data_br }}</td>
+        <td>{{ c.recebedor }}</td>
+        <td>{{ TIPOS_CUSTO[c.tipo] }}</td>
+        <td>{{ c.forma_pagamento }}</td>
+        <td>{{ c.descricao or '' }}</td>
+        <td>{% if c.comprovante %}<a href="{{ url_for('comprovante', nome=c.comprovante) }}" target="_blank">sim</a>{% else %}não{% endif %}</td>
+        <td class="num">{{ c.valor_centavos|moeda }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot><tr><th colspan="6">Total de custos</th><th class="num">{{ total_custos|moeda }}</th></tr></tfoot>
+  </table>
+
+  <h3>Custos por forma de pagamento</h3>
+  <table class="resumo">
+    {% for forma, valor in por_forma %}
+      <tr><td>{{ forma }}</td><td class="num">{{ valor|moeda }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="vazio">Nenhum custo no período.</p>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

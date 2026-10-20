@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block titulo %}Custos · Prestação de Contas{% endblock %}
+{% block conteudo %}
+<div class="cabecalho">
+  <h1>Custos</h1>
+  <a class="botao" href="{{ url_for('novo_custo') }}">+ Registrar custo</a>
+</div>
+
+<form class="filtros" method="get">
+  <label>De <input type="date" name="inicio" value="{{ inicio }}"></label>
+  <label>Até <input type="date" name="fim" value="{{ fim }}"></label>
+  <label>Tipo
+    <select name="tipo">
+      <option value="">Todos</option>
+      {% for chave, nome in TIPOS_CUSTO.items() %}
+        <option value="{{ chave }}" {{ 'selected' if tipo == chave }}>{{ nome }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button type="submit" class="botao botao-sec">Filtrar</button>
+  <a href="{{ url_for('custos') }}">Limpar</a>
+</form>
+
+{% if custos %}
+<table>
+  <thead>
+    <tr><th>Data</th><th>Recebedor</th><th>Tipo</th><th>Pagamento</th><th>Descrição</th><th>Comprovante</th><th class="num">Valor</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for c in custos %}
+    <tr>
+      <td>{{ c.data|data_br }}</td>
+      <td>{{ c.recebedor }}</td>
+      <td><span class="etiqueta etiqueta-{{ c.tipo }}">{{ TIPOS_CUSTO[c.tipo] }}</span></td>
+      <td>{{ c.forma_pagamento }}</td>
+      <td>{{ c.descricao or '' }}</td>
+      <td>
+        {% if c.comprovante %}
+          <a href="{{ url_for('comprovante', nome=c.comprovante) }}" target="_blank">📎 Ver</a>
+        {% else %}<span class="vazio">—</span>{% endif %}
+      </td>
+      <td class="num">{{ c.valor_centavos|moeda }}</td>
+      <td class="linha-acoes">
+        <a href="{{ url_for('editar_custo', custo_id=c.id) }}">Editar</a>
+        <form method="post" action="{{ url_for('excluir_custo', custo_id=c.id) }}" onsubmit="return confirm('Excluir este custo?')">
+          <input type="hidden" name="voltar" value="{{ request.full_path }}">
+          <button class="link-perigo" type="submit">Excluir</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr><th colspan="6">Total ({{ custos|length }} lançamento{{ 's' if custos|length != 1 }})</th><th class="num">{{ total|moeda }}</th><th></th></tr>
+  </tfoot>
+</table>
+{% else %}
+<p class="vazio">Nenhum custo encontrado.</p>
+{% endif %}
+{% endblock %}

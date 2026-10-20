@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Configurações · Prestação de Contas{% endblock %}
+{% block conteudo %}
+<h1>Configurações</h1>
+
+<form class="formulario" method="post">
+  <h2>Saldo inicial de caixa</h2>
+  <p class="dica">
+    Informe quanto havia em caixa no início do dia em que começou a usar o programa. O caixa exibido no painel e no
+    relatório é calculado como: saldo inicial + entradas − custos.
+  </p>
+  <div class="grade">
+    <label>Saldo inicial (R$)
+      <input type="text" name="saldo_inicial" inputmode="decimal" value="{{ saldo_inicial }}">
+    </label>
+    <label>A partir de (data de abertura)
+      <input type="date" name="saldo_inicial_data" value="{{ saldo_inicial_data }}">
+    </label>
+  </div>
+  <p class="dica">Lançamentos anteriores à data de abertura não entram no cálculo do caixa. Deixe a data em branco para considerar todos.</p>
+  <div class="acoes"><button type="submit" class="botao">Salvar</button></div>
+</form>
+{% endblock %}

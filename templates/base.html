@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Prestação de Contas{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topo nao-imprimir">
+    <a class="marca" href="{{ url_for('index') }}">🍽️ Prestação de Contas</a>
+    <nav>
+      {% set ep = request.endpoint or '' %}
+      <a href="{{ url_for('index') }}" class="{{ 'ativo' if ep == 'index' }}">Painel</a>
+      <a href="{{ url_for('custos') }}" class="{{ 'ativo' if 'custo' in ep }}">Custos</a>
+      <a href="{{ url_for('entradas') }}" class="{{ 'ativo' if 'entrada' in ep }}">Valor apurado</a>
+      <a href="{{ url_for('relatorio') }}" class="{{ 'ativo' if ep == 'relatorio' }}">Relatório</a>
+      <a href="{{ url_for('configuracoes') }}" class="{{ 'ativo' if ep == 'configuracoes' }}">Configurações</a>
+    </nav>
+  </header>
+
+  <main>
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+      {% for categoria, msg in mensagens %}
+        <div class="aviso aviso-{{ categoria }} nao-imprimir">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block conteudo %}{% endblock %}
+  </main>
+</body>
+</html>
