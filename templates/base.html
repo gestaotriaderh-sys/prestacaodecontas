@@ -4,11 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block titulo %}Prestação de Contas{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo-triade.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <header class="topo nao-imprimir">
-    <a class="marca" href="{{ url_for('index') }}">🍽️ Prestação de Contas</a>
+    <a class="marca" href="{{ url_for('index') }}">
+      <span class="marca-logo"><img src="{{ url_for('static', filename='logo-triade.png') }}" alt="Tríade RH"></span>
+      Prestação de Contas
+    </a>
     <nav>
       {% set ep = request.endpoint or '' %}
       <a href="{{ url_for('index') }}" class="{{ 'ativo' if ep == 'index' }}">Painel</a>

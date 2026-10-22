@@ -30,7 +30,17 @@ a { color: var(--primaria); }
   gap: 8px 24px;
   padding: 12px 24px;
 }
-.topo .marca { color: #fff; font-weight: 700; text-decoration: none; font-size: 17px; }
+.topo .marca { color: #fff; font-weight: 700; text-decoration: none; font-size: 17px; display: flex; align-items: center; gap: 10px; }
+.marca-logo { background: #fff; border-radius: 8px; padding: 3px 5px; display: flex; }
+.marca-logo img { height: 26px; width: auto; display: block; }
+
+.creditos {
+  display: flex; align-items: center; gap: 14px; background: var(--painel);
+  border: 1px solid var(--borda); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+}
+.creditos img { height: 48px; width: auto; }
+.creditos p { margin: 0; color: var(--suave); }
+.creditos strong { color: #6d1f2e; }
 .topo nav { display: flex; flex-wrap: wrap; gap: 4px; }
 .topo nav a {
   color: #e8e2dc; text-decoration: none; padding: 6px 12px; border-radius: 6px;
